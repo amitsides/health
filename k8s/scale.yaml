@@ -1,0 +1,30 @@
+apiVersion: karpenter.sh/v1alpha5
+kind: Provisioner
+metadata:
+ name: default
+spec:
+ requirements:
+   - key: node.kubernetes.io/instance-type
+     operator: In
+     values: ["m5.large"]
+ limits:
+   resources:
+     cpu: 1000
+     memory: 1000Gi
+ ttlSecondsAfterEmpty: 30
+ ttlSecondsUntilExpired: 2592000
+ providerRef:
+   name: default
+---
+apiVersion: karpenter.k8s.aws/v1alpha1
+kind: AWSNodeTemplate
+metadata:
+ name: default
+spec:
+ subnetSelector:
+   karpenter.sh/discovery: default
+ securityGroupSelector:
+   karpenter.sh/discovery: default
+ instanceProfile: KarpenterNodeInstanceProfile
+ minSize: 1
+ maxSize: 100
